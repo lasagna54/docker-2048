@@ -32,7 +32,7 @@ on:
 
 env:
   AWS_REGION: eu-central-1                   # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY: u1k0q0r7          # set this to your Amazon ECR repository name
+  ECR_REPOSITORY: u1k0q0r7/2048          # set this to your Amazon ECR repository name
   ECS_SERVICE: 2048-service                 # set this to your Amazon ECS service name
   ECS_CLUSTER: default                 # set this to your Amazon ECS cluster name
   ECS_TASK_DEFINITION: .aws/task.json # set this to the path to your Amazon ECS task definition
@@ -63,11 +63,13 @@ jobs:
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
+      with:
+          registry-type: public
 
     - name: Build, tag, and push image to Amazon ECR
       id: build-image
       env:
-        ECR_REGISTRY: public.ecr.aws
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
         # Build a docker container and
